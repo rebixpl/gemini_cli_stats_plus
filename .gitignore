@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local session data (if you ever copy it here)
+history/
+chats/
+sessions/
+session-*.json
+.gemini/
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
