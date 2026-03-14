@@ -1,5 +1,7 @@
 # ✨ Gemini CLI Stats Plus ✨
 
+![Gemini CLI Stats Plus Demo](demo.png)
+
 A powerful usage and cost analyzer for the [Gemini CLI](https://github.com/google/gemini-cli).
 
 ## Features
