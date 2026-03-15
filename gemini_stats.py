@@ -16,6 +16,28 @@ except ImportError:
     print("Please install 'rich' via 'pip install rich'")
     exit(1)
 
+SCHEMA = {
+    "total_sessions": "int",
+    "total_messages": "int",
+    "total_cost": "float",
+    "model_usage": "dict (model_name -> {input: int, output: int, cached: int, cost: float, messages: int})",
+    "project_usage": "dict (project_hash -> {messages: int, cost: float, sessions: int, id: str, name: str})",
+    "tool_usage": "dict (tool_name -> int)",
+    "session_durations": "list of dict ({file: str, duration: float, date: str})",
+    "active_days": "dict (date_str -> int)"
+}
+
+def get_agent_guide():
+    return """AGENT GUIDE:
+This module analyzes Gemini CLI session history.
+To use programmatically:
+    import gemini_stats
+    stats = gemini_stats.analyze(base_dir="path/to/.gemini", silent=True)
+    
+The 'analyze' function returns a dictionary with the following structure:
+%s
+""" % json.dumps(SCHEMA, indent=4)
+
 # Cost per 1M tokens (Input, Output, Cached)
 COSTS = {
     # Gemini 3 Preview
@@ -97,6 +119,29 @@ def get_project_map(base_dir):
                 except:
                     continue
     return project_map
+
+def analyze(base_dir=None, silent=False):
+    """Primary entry point for programmatic use."""
+    if base_dir is None:
+        base_dir = os.path.expanduser("~/.gemini")
+        
+    if not os.path.exists(base_dir):
+        if not silent:
+            print(f"Error: Directory '{base_dir}' not found.")
+        return None
+
+    if not silent:
+        print(f"Analyzing sessions in {base_dir}...")
+        
+    stats = analyze_sessions(base_dir)
+    
+    if not silent:
+        if stats["total_sessions"] == 0:
+            print("No valid session files found in the specified directory.")
+        else:
+            display_stats(stats)
+            
+    return stats
 
 def analyze_sessions(base_dir):
     project_map = get_project_map(base_dir)
@@ -274,17 +319,9 @@ def display_stats(stats):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Analyze Gemini CLI usage statistics.")
     parser.add_argument("--path", "-p", type=str, help="Path to Gemini sessions directory. Defaults to ~/.gemini")
+    parser.add_argument("--silent", "-s", action="store_true", help="Run in silent mode (only for programmatic check, though CLI usually wants output)")
     
     args = parser.parse_args()
-    base_dir = args.path if args.path else os.path.expanduser("~/.gemini")
+    path = args.path if args.path else os.path.expanduser("~/.gemini")
     
-    if not os.path.exists(base_dir):
-        print(f"Error: Directory '{base_dir}' not found.")
-        exit(1)
-        
-    stats = analyze_sessions(base_dir)
-    
-    if stats["total_sessions"] == 0:
-        print("No valid session files found in the specified directory.")
-    else:
-        display_stats(stats)
+    analyze(base_dir=path, silent=args.silent)

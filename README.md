@@ -36,6 +36,29 @@ By default, it looks for session data in `~/.gemini`. You can specify a custom p
 python gemini_stats.py --path /path/to/your/.gemini
 ```
 
+## Programmatic Usage
+
+You can import `gemini_stats` into your own Python scripts or orchestration tools:
+
+```python
+import gemini_stats
+
+# Run analysis in silent mode
+stats = gemini_stats.analyze(base_dir="~/.gemini", silent=True)
+
+if stats:
+    print(f"Total Sessions: {stats['total_sessions']}")
+    print(f"Total Messages: {stats['total_messages']}")
+    print(f"Total Cost: ${stats['total_cost']:.4f}")
+```
+
+### Agent Handshake
+If you are building an AI agent or orchestrator, you can use the built-in guide:
+
+```python
+print(gemini_stats.get_agent_guide())
+```
+
 ## Security
 
 This tool only reads local session metadata and contains no API keys or secrets. It is safe to use and share.
