@@ -155,7 +155,7 @@ def analyze_sessions(base_dir, status_callback=None):
         "total_messages": 0,
         "total_cost": 0.0,
         "model_usage": defaultdict(lambda: {"input": 0, "output": 0, "cached": 0, "cost": 0.0, "messages": 0}),
-        "project_usage": defaultdict(lambda: {"messages": 0, "cost": 0.0, "sessions": 0, "id": "", "name": ""}),
+        "project_usage": defaultdict(lambda: {"messages": 0, "cost": 0.0, "sessions": 0, "id": "", "name": "", "models": defaultdict(int)}),
         "tool_usage": defaultdict(int),
         "session_durations": [],
         "active_days": defaultdict(int)
@@ -230,6 +230,7 @@ def analyze_sessions(base_dir, status_callback=None):
                 
                 usage["messages"] += 1
                 usage["cost"] += cost
+                usage["models"][model] += 1
                 
                 stats["total_cost"] += cost
 
