@@ -120,7 +120,7 @@ def get_project_map(base_dir):
                     continue
     return project_map
 
-def analyze(base_dir=None, silent=False):
+def analyze(base_dir=None, silent=False, status_callback=None):
     """Primary entry point for programmatic use."""
     if base_dir is None:
         base_dir = os.path.expanduser("~/.gemini")
@@ -133,7 +133,7 @@ def analyze(base_dir=None, silent=False):
     if not silent:
         print(f"Analyzing sessions in {base_dir}...")
         
-    stats = analyze_sessions(base_dir)
+    stats = analyze_sessions(base_dir, status_callback=status_callback)
     
     if not silent:
         if stats["total_sessions"] == 0:
@@ -143,9 +143,11 @@ def analyze(base_dir=None, silent=False):
             
     return stats
 
-def analyze_sessions(base_dir):
+def analyze_sessions(base_dir, status_callback=None):
+    if status_callback: status_callback('Building project map...')
     project_map = get_project_map(base_dir)
     search_pattern = os.path.join(base_dir, "**", "*.json")
+    if status_callback: status_callback('Finding session files...')
     files = glob.glob(search_pattern, recursive=True)
     
     stats = {
@@ -159,7 +161,9 @@ def analyze_sessions(base_dir):
         "active_days": defaultdict(int)
     }
 
-    for file_path in files:
+    if status_callback: status_callback(f'Processing {len(files)} sessions...')
+    for i, file_path in enumerate(files):
+        if status_callback and i % 50 == 0: status_callback(f'Analyzed {i}/{len(files)} sessions...')
         if not os.path.basename(file_path).startswith("session-"):
             continue
             
