@@ -1,8 +1,8 @@
-<p align="center">
+<p align="left">
   <img src="gemini_cli_stats_plus_icon.png" width="128" alt="Gemini CLI Stats Plus Icon">
 </p>
 
-# ✨ Gemini CLI Stats Plus ✨
+# Gemini CLI Stats Plus
 
 ![Gemini CLI Stats Plus Demo](demo.png)
 
