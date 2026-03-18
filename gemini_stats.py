@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
 import os
 import json
 import glob
 import argparse
 import hashlib
+import platform
 from datetime import datetime
 from collections import defaultdict
 
@@ -101,21 +103,36 @@ def get_project_map(base_dir):
                     with open(root_file, "r") as f:
                         path = f.read().strip()
                         
-                        # Try standard CLI normalization (normcase + normpath)
-                        # This is what the CLI typically uses for consistent hashing
+                        # Standard normalization
                         norm_path = os.path.normcase(os.path.normpath(path))
                         h = hashlib.sha256(norm_path.encode()).hexdigest()
                         project_map[h] = project_name
                         
-                        # Fallback: Literal path hash
+                        # Fallback 1: Literal path hash
                         h_literal = hashlib.sha256(path.encode()).hexdigest()
                         if h_literal not in project_map:
                             project_map[h_literal] = project_name
                             
-                        # Fallback: Just normpath without normcase
+                        # Fallback 2: Just normpath without normcase
                         h_norm = hashlib.sha256(os.path.normpath(path).encode()).hexdigest()
                         if h_norm not in project_map:
                             project_map[h_norm] = project_name
+                            
+                        # Fallback 3: Forced lowercase (handles case-insensitive moves)
+                        h_lower = hashlib.sha256(path.lower().encode()).hexdigest()
+                        if h_lower not in project_map:
+                            project_map[h_lower] = project_name
+                            
+                        # Fallback 4: Normalize separators (handles \ vs / moves)
+                        clean_path = path.replace("\\", "/").rstrip("/")
+                        h_clean = hashlib.sha256(clean_path.encode()).hexdigest()
+                        if h_clean not in project_map:
+                            project_map[h_clean] = project_name
+                            
+                        # Fallback 5: Lowercase + normalized separators
+                        h_clean_lower = hashlib.sha256(clean_path.lower().encode()).hexdigest()
+                        if h_clean_lower not in project_map:
+                            project_map[h_clean_lower] = project_name
                 except:
                     continue
     return project_map
@@ -124,6 +141,9 @@ def analyze(base_dir=None, silent=False, status_callback=None):
     """Primary entry point for programmatic use."""
     if base_dir is None:
         base_dir = os.path.expanduser("~/.gemini")
+    
+    # Cross-platform path normalization
+    base_dir = os.path.normpath(base_dir.replace("\\", os.sep).replace("/", os.sep))
         
     if not os.path.exists(base_dir):
         if not silent:

@@ -18,22 +18,41 @@ A powerful usage and cost analyzer for the [Gemini CLI](https://github.com/googl
 
 ## Installation
 
+### Windows
 ```bash
 pip install rich
 ```
 
+### macOS / Linux
+```bash
+pip3 install rich
+```
+
 ## Usage
 
-Run the script from your terminal:
-
+### Windows
 ```bash
 python gemini_stats.py
 ```
 
-By default, it looks for session data in `~/.gemini`. You can specify a custom path using the `--path` or `-p` argument:
+### macOS / Linux
+```bash
+# Ensure you are using python3
+python3 gemini_stats.py
+```
+
+By default, it looks for session data in `~/.gemini` (Standard path for both Windows and macOS). You can specify a custom path using the `--path` or `-p` argument:
 
 ```bash
-python gemini_stats.py --path /path/to/your/.gemini
+python3 gemini_stats.py --path /path/to/your/.gemini
+```
+
+## Tips for macOS Users
+You can make the script executable and add it to your path:
+```bash
+chmod +x gemini_stats.py
+# Then run it as:
+./gemini_stats.py
 ```
 
 ## Programmatic Usage
